@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private Transform _cubeToPlace;
     [SerializeField] private GameObject _cubeToCreate, _allCubes;
     private Rigidbody _allcubesRb;
+    private bool _isLose;
+    private Coroutine _showCubePlace;
 
     private List<Vector3> _allCubePositions = new List<Vector3>
     {
@@ -31,13 +33,13 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         _allcubesRb = _allCubes.GetComponent<Rigidbody>();
-        StartCoroutine(ShowCubePlace());
+        _showCubePlace = StartCoroutine(ShowCubePlace());
         
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && _cubeToPlace != null)
         {
             GameObject newCube = Instantiate(
                 _cubeToCreate,
@@ -52,6 +54,13 @@ public class GameController : MonoBehaviour
             _allcubesRb.isKinematic = false;
             SpawnPositions();
             
+        }
+
+        if (!_isLose && _allcubesRb.velocity.magnitude > 0.1f)
+        {
+            Destroy(_cubeToPlace.gameObject);
+            _isLose = true;
+            StopCoroutine(_showCubePlace);
         }
     }
 
