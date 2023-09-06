@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Random = UnityEngine.Random;
+
 
 public class GameController : MonoBehaviour
 {
@@ -10,8 +12,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private float _cubeChangePlaceSpeed = 0.5f;
     [SerializeField] private Transform _cubeToPlace;
     [SerializeField] private GameObject _cubeToCreate, _allCubes;
+    [SerializeField] private GameObject[] canvasStartPage;
     private Rigidbody _allcubesRb;
-    private bool _isLose;
+    private bool _isLose, _firstCube;
     private Coroutine _showCubePlace;
 
     private List<Vector3> _allCubePositions = new List<Vector3>
@@ -39,8 +42,18 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _cubeToPlace != null)
+        if (Input.GetMouseButtonDown(0) && _cubeToPlace != null && !EventSystem.current.IsPointerOverGameObject())
         {
+            
+            if (!_firstCube)
+            {
+                _firstCube = true;
+                foreach (GameObject obj in canvasStartPage)
+                {
+                    Destroy(obj);
+                }
+            }
+            
             GameObject newCube = Instantiate(
                 _cubeToCreate,
                 _cubeToPlace.position,
